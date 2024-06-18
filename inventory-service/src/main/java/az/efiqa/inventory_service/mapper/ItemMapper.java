@@ -2,14 +2,25 @@ package az.efiqa.inventory_service.mapper;
 
 import az.efiqa.inventory_service.dto.ItemDTO;
 import az.efiqa.inventory_service.entity.Item;
-import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-public interface ItemMapper {
-    ItemMapper INSTANCE = Mappers.getMapper(ItemMapper.class);
-    @Mapping(source = "category.id", target = "categoryId")
-    ItemDTO itemToItemDTO(Item item);
+@Component
+public class ItemMapper {
+    private final ModelMapper modelMapper;
 
-    @Mapping(target = "category", ignore = true)
-    Item itemDTOToItem(ItemDTO itemDTO);
+    @Autowired
+    public ItemMapper(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
+    }
+    public ItemDTO mapToDto(Item item) {
+        return modelMapper.map(item, ItemDTO.class);
+    }
+
+    public Item mapToEntity(ItemDTO itemDTO) {
+        return modelMapper.map(itemDTO, Item.class);
+    }
+
+
 }

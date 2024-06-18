@@ -5,6 +5,7 @@ import az.efiqa.inventory_service.entity.Item;
 import az.efiqa.inventory_service.mapper.ItemMapper;
 import az.efiqa.inventory_service.repository.ItemRepository;
 import az.efiqa.inventory_service.service.ItemService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,23 +15,25 @@ import java.util.Optional;
 
 @Service
 public class ItemServiceImpl implements ItemService {
-    @Autowired
+
     private final ItemRepository itemRepository;
+    private final ItemMapper itemMapper;
 
-
-    public ItemServiceImpl(ItemRepository itemRepository) {
+    @Autowired
+    public ItemServiceImpl(ItemRepository itemRepository, ModelMapper modelMapper, ItemMapper itemMapper) {
         this.itemRepository = itemRepository;
+        this.itemMapper = itemMapper;
     }
 
 
     @Override
     public ItemDTO addNewItem(ItemDTO itemDTO) {
-        Item newItem = ItemMapper.INSTANCE.itemDTOToItem(itemDTO);
+        Item newItem = itemMapper.mapToEntity(itemDTO);
         Optional<Item> existingItem = itemRepository.findByName(itemDTO.getName());
         if (existingItem.isEmpty()) {
             newItem = itemRepository.save(newItem);
         }
-        return ItemMapper.INSTANCE.itemToItemDTO(newItem);
+        return itemMapper.mapToDto(newItem);
     }
 
     @Override
@@ -38,11 +41,11 @@ public class ItemServiceImpl implements ItemService {
         List<Item> items = itemRepository.findAll();
         if (items.isEmpty() == false) {
             List<ItemDTO> itemDTOS = new ArrayList<>();
-            items.forEach(item -> itemDTOS.add(ItemMapper.INSTANCE.itemToItemDTO(item)));
+            items.forEach(item -> itemDTOS.add(itemMapper.mapToDto(item)));
             return itemDTOS;
 
         }
-        throw new RuntimeException();
+        return null;
     }
 
     @Override
@@ -50,7 +53,7 @@ public class ItemServiceImpl implements ItemService {
         Optional<Item>  optionalItem =itemRepository.findById(id);
         if(optionalItem.isPresent()){
             Item foundItem=optionalItem.get();
-            return ItemMapper.INSTANCE.itemToItemDTO(foundItem);
+            return itemMapper.mapToDto(foundItem);
         }
         return null;
     }
@@ -63,7 +66,7 @@ public class ItemServiceImpl implements ItemService {
             updatedItem.setName(itemDTO.getName());
             updatedItem.setDescription(itemDTO.getDescription());
             updatedItem.setQuantity(itemDTO.getQuantity());
-            return ItemMapper.INSTANCE.itemToItemDTO(updatedItem);
+            return itemMapper.mapToDto(updatedItem);
         }
        return null;
     }

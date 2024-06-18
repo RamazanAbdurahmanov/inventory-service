@@ -1,7 +1,6 @@
 package az.efiqa.inventory_service.service.impl;
 
 import az.efiqa.inventory_service.dto.ItemCategoryDTO;
-import az.efiqa.inventory_service.entity.Item;
 import az.efiqa.inventory_service.entity.ItemCategory;
 import az.efiqa.inventory_service.mapper.ItemCategoryMapper;
 import az.efiqa.inventory_service.repository.CategoryRepository;
@@ -17,20 +16,23 @@ import java.util.Optional;
 
 public class CategoryServiceImpl implements CategoryService {
 
-    @Autowired
-    private final CategoryRepository categoryRepository;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+    private final CategoryRepository categoryRepository;
+    private final ItemCategoryMapper itemCategoryMapper;
+
+    @Autowired
+    public CategoryServiceImpl(CategoryRepository categoryRepository, ItemCategoryMapper itemCategoryMapper) {
         this.categoryRepository = categoryRepository;
+        this.itemCategoryMapper = itemCategoryMapper;
     }
 
     @Override
     public ItemCategoryDTO addNewCategory(ItemCategoryDTO itemCategoryDTO) {
-        ItemCategory itemCategory = ItemCategoryMapper.INSTANCE.itemCategoryDtoToItemCategory(itemCategoryDTO);
+        ItemCategory itemCategory = itemCategoryMapper.mapToEntity(itemCategoryDTO);
         Optional<ItemCategory> existingCategory = categoryRepository.findByName(itemCategoryDTO.getName());
         if (existingCategory.isEmpty()) {
             ItemCategory savedCategory = categoryRepository.save(itemCategory);
-            return ItemCategoryMapper.INSTANCE.itemCategoryToItemCategoryDTO(savedCategory);
+            return itemCategoryMapper.mapToDto(savedCategory);
         }
         return null;
     }
@@ -40,7 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
         List<ItemCategory> itemCategories = categoryRepository.findAll();
         if (itemCategories.isEmpty() == false) {
             List<ItemCategoryDTO> itemCategoryDTOS = new ArrayList<>();
-            itemCategories.forEach(itemCategory -> itemCategoryDTOS.add(ItemCategoryMapper.INSTANCE.itemCategoryToItemCategoryDTO(itemCategory)));
+            itemCategories.forEach(itemCategory -> itemCategoryDTOS.add(itemCategoryMapper.mapToDto(itemCategory)));
             return itemCategoryDTOS;
         }
         return null;
@@ -50,7 +52,7 @@ public class CategoryServiceImpl implements CategoryService {
     public ItemCategoryDTO getCategoryById(Long id) {
         Optional<ItemCategory> optionalItemCategory = categoryRepository.findById(id);
         if (optionalItemCategory.isPresent()) {
-            return ItemCategoryMapper.INSTANCE.itemCategoryToItemCategoryDTO(optionalItemCategory.get());
+            return itemCategoryMapper.mapToDto(optionalItemCategory.get());
         }
         return null;
     }
@@ -62,7 +64,7 @@ public class CategoryServiceImpl implements CategoryService {
             ItemCategory updatedItemCategory = optionalItemCategory.get();
             updatedItemCategory.setName(itemCategoryDTO.getName());
             updatedItemCategory.setDescription(itemCategoryDTO.getDescription());
-            return ItemCategoryMapper.INSTANCE.itemCategoryToItemCategoryDTO(updatedItemCategory);
+            return itemCategoryMapper.mapToDto(updatedItemCategory);
         }
         return null;
     }
