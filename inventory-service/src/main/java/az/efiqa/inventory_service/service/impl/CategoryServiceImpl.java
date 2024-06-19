@@ -2,6 +2,8 @@ package az.efiqa.inventory_service.service.impl;
 
 import az.efiqa.inventory_service.dto.ItemCategoryDTO;
 import az.efiqa.inventory_service.entity.ItemCategory;
+import az.efiqa.inventory_service.exceptions.CategoryAlreadyExistsException;
+import az.efiqa.inventory_service.exceptions.CategoryNotFoundException;
 import az.efiqa.inventory_service.mapper.ItemCategoryMapper;
 import az.efiqa.inventory_service.repository.CategoryRepository;
 import az.efiqa.inventory_service.service.CategoryService;
@@ -30,11 +32,12 @@ public class CategoryServiceImpl implements CategoryService {
     public ItemCategoryDTO addNewCategory(ItemCategoryDTO itemCategoryDTO) {
         ItemCategory itemCategory = itemCategoryMapper.mapToEntity(itemCategoryDTO);
         Optional<ItemCategory> existingCategory = categoryRepository.findByName(itemCategoryDTO.getName());
-        if (existingCategory.isEmpty()) {
+        if (existingCategory.isPresent()) {
+            throw new CategoryAlreadyExistsException(itemCategoryDTO.getName() + " adli kategoriya artiq bazada movcuddur.");
+        } else {
             ItemCategory savedCategory = categoryRepository.save(itemCategory);
             return itemCategoryMapper.mapToDto(savedCategory);
         }
-        return null;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class CategoryServiceImpl implements CategoryService {
             itemCategories.forEach(itemCategory -> itemCategoryDTOS.add(itemCategoryMapper.mapToDto(itemCategory)));
             return itemCategoryDTOS;
         }
-        return null;
+        throw new CategoryNotFoundException("Hec bir kategoriya tapilmadi");
     }
 
     @Override
@@ -54,7 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (optionalItemCategory.isPresent()) {
             return itemCategoryMapper.mapToDto(optionalItemCategory.get());
         }
-        return null;
+        throw new CategoryNotFoundException(id + " bu idili category tapilmadi");
     }
 
     @Override
@@ -66,7 +69,7 @@ public class CategoryServiceImpl implements CategoryService {
             updatedItemCategory.setDescription(itemCategoryDTO.getDescription());
             return itemCategoryMapper.mapToDto(updatedItemCategory);
         }
-        return null;
+        throw new CategoryNotFoundException(id + " Bu id-li categoriya bazada yoxdur");
     }
 
     @Override
@@ -74,8 +77,7 @@ public class CategoryServiceImpl implements CategoryService {
         Optional<ItemCategory> deletedItemCategory = categoryRepository.findById(id);
         if (deletedItemCategory.isPresent()) {
             categoryRepository.deleteById(id);
-        } else {
-            throw new RuntimeException();
         }
+        throw new CategoryNotFoundException(id + " bu id-li kategoriya bazada yoxdur");
     }
 }

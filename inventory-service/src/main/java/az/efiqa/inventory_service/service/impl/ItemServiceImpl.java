@@ -2,6 +2,8 @@ package az.efiqa.inventory_service.service.impl;
 
 import az.efiqa.inventory_service.dto.ItemDTO;
 import az.efiqa.inventory_service.entity.Item;
+import az.efiqa.inventory_service.exceptions.ItemAlreadyExistsException;
+import az.efiqa.inventory_service.exceptions.ItemNotFoundException;
 import az.efiqa.inventory_service.mapper.ItemMapper;
 import az.efiqa.inventory_service.repository.ItemRepository;
 import az.efiqa.inventory_service.service.ItemService;
@@ -30,10 +32,11 @@ public class ItemServiceImpl implements ItemService {
     public ItemDTO addNewItem(ItemDTO itemDTO) {
         Item newItem = itemMapper.mapToEntity(itemDTO);
         Optional<Item> existingItem = itemRepository.findByName(itemDTO.getName());
-        if (existingItem.isEmpty()) {
-            newItem = itemRepository.save(newItem);
+        if (existingItem.isPresent()) {
+            throw new ItemAlreadyExistsException(itemDTO.getName() + "Bu adda esya artiq var");
+        } else {
+            return itemMapper.mapToDto(itemRepository.save(newItem));
         }
-        return itemMapper.mapToDto(newItem);
     }
 
     @Override
@@ -45,40 +48,39 @@ public class ItemServiceImpl implements ItemService {
             return itemDTOS;
 
         }
-        return null;
+        throw new ItemNotFoundException("Hec bir esya tapilmadi");
     }
 
     @Override
     public ItemDTO getItemById(Long id) {
-        Optional<Item>  optionalItem =itemRepository.findById(id);
-        if(optionalItem.isPresent()){
-            Item foundItem=optionalItem.get();
+        Optional<Item> optionalItem = itemRepository.findById(id);
+        if (optionalItem.isPresent()) {
+            Item foundItem = optionalItem.get();
             return itemMapper.mapToDto(foundItem);
         }
-        return null;
+        throw new ItemNotFoundException("id : " + id + " tapilmadi");
     }
 
     @Override
     public ItemDTO updateItemById(Long id, ItemDTO itemDTO) {
-        Optional<Item> optionalItem=itemRepository.findById( id);
-        if(optionalItem.isPresent()){
-            Item updatedItem=optionalItem.get();
+        Optional<Item> optionalItem = itemRepository.findById(id);
+        if (optionalItem.isPresent()) {
+            Item updatedItem = optionalItem.get();
             updatedItem.setName(itemDTO.getName());
             updatedItem.setDescription(itemDTO.getDescription());
             updatedItem.setQuantity(itemDTO.getQuantity());
             return itemMapper.mapToDto(updatedItem);
         }
-       return null;
+        throw new ItemNotFoundException("Id : " + id + " tapilmadi");
     }
 
     @Override
     public void deleteItemById(Long id) {
-        Optional<Item> deletedItem=itemRepository.findById(id);
-        if (deletedItem.isPresent()){
+        Optional<Item> deletedItem = itemRepository.findById(id);
+        if (deletedItem.isPresent()) {
             itemRepository.deleteById(id);
-        }
-        else {
-            throw new RuntimeException();
+        } else {
+            throw new ItemNotFoundException("Id : " + id + " Tapilmadi");
         }
     }
 
