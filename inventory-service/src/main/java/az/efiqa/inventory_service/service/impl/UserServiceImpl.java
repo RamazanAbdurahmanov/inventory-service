@@ -2,6 +2,7 @@ package az.efiqa.inventory_service.service.impl;
 
 import az.efiqa.inventory_service.dto.UserDTO;
 import az.efiqa.inventory_service.entity.User;
+import az.efiqa.inventory_service.enums.ROLE;
 import az.efiqa.inventory_service.exceptions.UserAlreadyExistsException;
 import az.efiqa.inventory_service.exceptions.UserNotFoundException;
 import az.efiqa.inventory_service.mapper.UserMapper;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 @Service
 
 public class UserServiceImpl implements UserService {
@@ -35,9 +37,11 @@ public class UserServiceImpl implements UserService {
         if (foundUser.isPresent()) {
             throw new UserAlreadyExistsException("Bele bir istifadeci artiq var ");
         } else {
-            User newUser = foundUser.get();
-            newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-            return userMapper.toDto(newUser);
+
+            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            user.setRole(ROLE.ROLE_USER);
+            userRepository.save(user);
+            return userMapper.toDto(user);
         }
 
     }
@@ -64,15 +68,7 @@ public class UserServiceImpl implements UserService {
         throw new UserNotFoundException(id + " id-li User tyapilmadi");
     }
 
-    @Override
-    public UserDTO getUserByName(String name) {
-        Optional<User> optionalUser = userRepository.findByUsername(name);
-        if (optionalUser.isPresent()) {
-            User foundUser = optionalUser.get();
-            return userMapper.toDto(foundUser);
-        }
-        throw new UserNotFoundException(name + " bu adda User tapilmadi");
-    }
+
 
     @Override
     public UserDTO updateUserById(Long id, UserDTO userDTO) {
@@ -80,8 +76,9 @@ public class UserServiceImpl implements UserService {
         if (optionalUser.isPresent()) {
             User updatedUser = optionalUser.get();
             updatedUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-            updatedUser.setRoles(userDTO.getRoles());
+            updatedUser.setRole(userDTO.getRole());
             updatedUser.setUsername(userDTO.getUsername());
+            userRepository.save(updatedUser);
             return userMapper.toDto(updatedUser);
         }
         throw new UserNotFoundException(id + " id-li User tapilmadi");

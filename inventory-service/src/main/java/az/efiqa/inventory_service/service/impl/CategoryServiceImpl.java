@@ -67,6 +67,7 @@ public class CategoryServiceImpl implements CategoryService {
             ItemCategory updatedItemCategory = optionalItemCategory.get();
             updatedItemCategory.setName(itemCategoryDTO.getName());
             updatedItemCategory.setDescription(itemCategoryDTO.getDescription());
+            categoryRepository.save(updatedItemCategory);
             return itemCategoryMapper.mapToDto(updatedItemCategory);
         }
         throw new CategoryNotFoundException(id + " Bu id-li categoriya bazada yoxdur");

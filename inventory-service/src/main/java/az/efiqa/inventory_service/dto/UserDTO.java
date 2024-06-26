@@ -1,12 +1,12 @@
 package az.efiqa.inventory_service.dto;
 
-import az.efiqa.inventory_service.enums.ROLES;
+import az.efiqa.inventory_service.enums.ROLE;
 
 public class UserDTO {
     private Long id;
     private String username;
     private String password;
-    private ROLES roles;
+    private ROLE role;
 
     public Long getId() {
         return id;
@@ -24,12 +24,12 @@ public class UserDTO {
         this.username = username;
     }
 
-    public ROLES getRoles() {
-        return roles;
+    public ROLE getRole() {
+        return role;
     }
 
-    public void setRoles(ROLES roles) {
-        this.roles = roles;
+    public void setRole(ROLE role) {
+        this.role = role;
     }
 
     public String getPassword() {

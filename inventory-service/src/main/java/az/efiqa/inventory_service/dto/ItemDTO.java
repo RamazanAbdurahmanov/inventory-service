@@ -1,6 +1,5 @@
 package az.efiqa.inventory_service.dto;
 
-
 public class ItemDTO {
     private Long id;
     private String name;

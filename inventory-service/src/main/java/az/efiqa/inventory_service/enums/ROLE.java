@@ -1,5 +1,5 @@
 package az.efiqa.inventory_service.enums;
 
-public enum ROLES {
+public enum ROLE {
     ROLE_ADMIN, ROLE_USER
 }

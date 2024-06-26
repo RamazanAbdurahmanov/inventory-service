@@ -35,10 +35,10 @@ public class UserController {
         return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
     }
 
-    @GetMapping("/{username}")
-    private ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
-        return new ResponseEntity<>(userService.getUserByName(username), HttpStatus.OK);
-    }
+//    @GetMapping("/{username}")
+//    private ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
+//        return new ResponseEntity<>(userService.getUserByName(username), HttpStatus.OK);
+//    }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {

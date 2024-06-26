@@ -1,12 +1,15 @@
 package az.efiqa.inventory_service.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 
 public class ItemCategoryDTO {
     private Long id;
     private String name;
     private String description;
+    @JsonIgnore
     private List<Long> itemIds;
 
     public Long getId() {

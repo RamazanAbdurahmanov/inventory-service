@@ -7,7 +7,6 @@ public interface UserService {
     UserDTO addNewUser(UserDTO userDTO);
     List<UserDTO> getAllUsers();
     UserDTO getUserById(Long id);
-    UserDTO getUserByName(String name);
     UserDTO updateUserById(Long id,UserDTO userDTO);
     String deleteUserById(Long id);
 

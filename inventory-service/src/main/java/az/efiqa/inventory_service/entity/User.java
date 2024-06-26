@@ -1,6 +1,6 @@
 package az.efiqa.inventory_service.entity;
 
-import az.efiqa.inventory_service.enums.ROLES;
+import az.efiqa.inventory_service.enums.ROLE;
 import jakarta.persistence.*;
 
 @Entity
@@ -13,8 +13,8 @@ public class User {
     private String username;
     @Column(nullable = false)
     private String password;
-
-    private ROLES roles;
+    @Enumerated(EnumType.STRING)
+    private ROLE role;
 
     public Long getId() {
         return id;
@@ -40,11 +40,11 @@ public class User {
         this.password = password;
     }
 
-    public ROLES getRoles() {
-        return roles;
+    public ROLE getRole() {
+        return role;
     }
 
-    public void setRoles(ROLES roles) {
-        this.roles = roles;
+    public void setRole(ROLE role) {
+        this.role = role;
     }
 }
